@@ -1,7 +1,19 @@
-import cv2 
+'''
+    -- Government Technical Institute -- 
+
+    CLASS: ODCS2
+    LECTURER: Sir Samaroo Randolph
+    DATE: 26/04/2023
+    
+    DEVELOPERS:
+        Roclay Rodrigues and Christopher McKay
+'''
+
+import cv2
 import mediapipe as mp
 import pyautogui
 import time
+
 
 def count_fingers(lst):
     cnt = 0
@@ -23,8 +35,15 @@ def count_fingers(lst):
     if (lst.landmark[5].x*100 - lst.landmark[4].x*100) > 6:
         cnt += 1
 
+    return cnt
 
-    return cnt 
+# Players hand states
+player = None
+bot = None
+
+def start_game():
+    print(f"you played: {player}")
+
 
 cap = cv2.VideoCapture(0)
 
@@ -33,7 +52,7 @@ hands = mp.solutions.hands
 hand_obj = hands.Hands(max_num_hands=1)
 
 
-start_init = False 
+start_init = False
 
 prev = -1
 
@@ -50,38 +69,32 @@ while True:
 
         cnt = count_fingers(hand_keyPoints)
 
-        if not(prev==cnt):
-            if not(start_init):
+        if not (prev == cnt):
+            if not (start_init):
                 start_time = time.time()
                 start_init = True
 
-            elif (end_time-start_time) > 0.2:
+            elif (end_time-start_time) > 1:
                 if (cnt == 1):
-                    pyautogui.press("right")
-                    print("1")
-                
+                    player = "scissors"
+
                 elif (cnt == 2):
-                    pyautogui.press("left")
-                    print("2")
+                    player = "scissors"
 
                 elif (cnt == 3):
-                    pyautogui.press("up")
-                    print("3")
+                    player = "scissors"
 
                 elif (cnt == 4):
-                    pyautogui.press("down")
-                    print("4")
+                    player = "paper"
 
                 elif (cnt == 5):
-                    print("5")
-                    pyautogui.press("space")
+                    player = "paper"
+
+                elif (cnt == 0):
+                    player = "rock"
 
                 prev = cnt
                 start_init = False
-
-
-        
-
 
         drawing.draw_landmarks(frm, hand_keyPoints, hands.HAND_CONNECTIONS)
 
@@ -91,3 +104,6 @@ while True:
         cv2.destroyAllWindows()
         cap.release()
         break
+
+    if cv2.waitKey(1) == 32:
+        start_game()
