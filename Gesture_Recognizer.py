@@ -3,7 +3,7 @@ import cv2
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-model_path = 'gesture_recognizer.task'
+model_path = '/gesture_recognizer.task'
 
 BaseOptions = mp.tasks.BaseOptions
 GestureRecognizer = mp.tasks.vision.GestureRecognizer
@@ -15,8 +15,8 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 capture = cv2.VideoCapture(0)
 
 if not capture.isOpened():
-  print("Cannot open camera")
-  exit()
+    print("Cannot open camera")
+    exit()
 
 # Create a loop to read the latest frame from the camera using VideoCapture#read()
 while True:
@@ -25,7 +25,7 @@ while True:
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         break
-    
+
     # Convert the frame received from OpenCV to a MediaPipe’s Image object.
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
 
@@ -38,6 +38,5 @@ while True:
         running_mode=VisionRunningMode.LIVE_STREAM,
         result_callback=print_result)
     with GestureRecognizer.create_from_options(options) as recognizer:
-    # The detector is initialized. Use it here.
+        # The detector is initialized. Use it here.
         recognizer.recognize_async(mp_image, frame_timestamp_ms)
-    
