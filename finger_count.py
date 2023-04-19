@@ -11,9 +11,8 @@
 
 import cv2
 import mediapipe as mp
-import pyautogui
 import time
-
+import random
 
 def count_fingers(lst):
     cnt = 0
@@ -37,20 +36,18 @@ def count_fingers(lst):
 
     return cnt
 
-# Players hand states
-player = None
-bot = None
-
-def start_game():
-    print(f"you played: {player}")
-
-
 cap = cv2.VideoCapture(0)
 
 drawing = mp.solutions.drawing_utils
 hands = mp.solutions.hands
 hand_obj = hands.Hands(max_num_hands=1)
 
+# selects random of three
+options = ["paper", "scissors", "rock"]
+bot = random.choice(options)
+
+player = None
+winner = None
 
 start_init = False
 
@@ -75,17 +72,8 @@ while True:
                 start_init = True
 
             elif (end_time-start_time) > 1:
-                if (cnt == 1):
+                if (cnt == 2):
                     player = "scissors"
-
-                elif (cnt == 2):
-                    player = "scissors"
-
-                elif (cnt == 3):
-                    player = "scissors"
-
-                elif (cnt == 4):
-                    player = "paper"
 
                 elif (cnt == 5):
                     player = "paper"
@@ -93,10 +81,17 @@ while True:
                 elif (cnt == 0):
                     player = "rock"
 
+                else:
+                    player = None
+
                 prev = cnt
                 start_init = False
 
         drawing.draw_landmarks(frm, hand_keyPoints, hands.HAND_CONNECTIONS)
+
+    cv2.putText(frm, f"Player: {player}      Bot: {bot}",(0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA, False)
+
+    cv2.putText(frm, f"Winner: {winner}",(0, 450), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA, False)
 
     cv2.imshow("window", frm)
 
@@ -105,5 +100,18 @@ while True:
         cap.release()
         break
 
-    if cv2.waitKey(1) == 32:
-        start_game()
+    if player:
+        if player == "paper" and bot == "rock":
+            winner = "Player"
+            
+        elif player == "rock" and bot == "scissors":
+            winner = "Player"
+
+        elif player == "scissors" and bot == "paper":
+            winner = "Player"
+
+        else:
+            winner = "Bot"
+
+    else:
+        winner = "Undetermined"
